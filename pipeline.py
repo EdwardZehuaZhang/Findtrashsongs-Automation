@@ -10,10 +10,9 @@ import logging
 import numpy as np
 
 def save_song_info_to_file(day, song_name, artist_name, file_path='song_info.json'):
-    # Convert Pandas types to Python native types if needed
     day = int(day) if isinstance(day, (pd.Int64Dtype, pd.Series, np.int64)) else day
     song_info = {
-        "day": day,  # Make sure 'day' is a Python int
+        "day": day,  
         "song_name": song_name,
         "artist_name": artist_name
     }
@@ -43,9 +42,8 @@ def process_first_row(csv_file):
 
     logging.info(f"Processing {song_name} by {artist_name} for Day {day}...")
 
-    # Drop the first row and overwrite the CSV file
     df = df.drop(df.index[0])
-    df.to_csv(csv_file, index=False, encoding='utf-8-sig')  # Saving back to CSV
+    df.to_csv(csv_file, index=False, encoding='utf-8-sig')  
 
     return day, song_name, artist_name
 
@@ -61,24 +59,21 @@ def run_subprocess_with_realtime_output(command):
     process.poll()
 
 def run_pipeline():
-    # Set up logging to output to both the file and the console
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.FileHandler('pipeline_log.txt'),  # Log to file
-            logging.StreamHandler(sys.stdout)  # Log to console
+            logging.FileHandler('pipeline_log.txt'), 
+            logging.StreamHandler(sys.stdout)  
         ]
     )
 
-    # Extract song info from CSV and save to JSON once
     day, song_name, artist_name = process_first_row(csv_file)
     if not day or not song_name or not artist_name:
         logging.error("Song information missing. Exiting pipeline.")
         return
     save_song_info_to_file(day, song_name, artist_name)
 
-    # Reuse song info from the JSON file
     song_info = load_song_info()
     day = song_info['day']
     song_name = song_info['song_name']

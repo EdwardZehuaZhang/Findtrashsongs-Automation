@@ -6,15 +6,21 @@ import whisper
 import lyricsgenius
 from fuzzywuzzy import fuzz
 import gc
+import pandas as pd
+import json
+
+def load_song_info(file_path='song_info.json'):
+    with open(file_path, 'r') as json_file:
+        return json.load(json_file)
+
 
 def extract_vocals(input_video):
     output_folder = os.path.dirname(input_video)
     separator = Separator('spleeter:2stems', multiprocess=False)  
     separator.separate_to_file(input_video, output_folder)
     
-    vocal_file_path = os.path.join(output_folder, 'vocals', 'vocals.wav')
+    vocal_file_path = os.path.join(output_folder, 'output_with_caption', 'vocals.wav')
     return vocal_file_path
-
 
 
 def genius_lyrics(song_name, artist_name):
@@ -60,7 +66,7 @@ def match_correct_lyrics(transcribed_segments, correct_lyrics):
     return matched_segments
 
 
-def add_captions_to_video_from_matched(video_path, matched_segments):
+def add_captions_to_video_from_matched(video_path, matched_segments, day, song_name, artist_name):
     video = VideoFileClip(video_path)
     captions = []
     video_height = video.h
@@ -82,21 +88,31 @@ def add_captions_to_video_from_matched(video_path, matched_segments):
         captions.append(caption)
 
     final_video = CompositeVideoClip([video, *captions])
-    final_video.write_videofile("video_with_matched_lyrics_wrapped.mp4", codec="libx264", audio_codec="aac")
+    
+    output_filename = f"Day {day} {song_name} - {artist_name}.mp4"
+    
+    final_video.write_videofile(output_filename, codec="libx264", audio_codec="aac")
+    return output_filename  
 
 
 def run_caption_pipeline():
-    extract_vocals("output_with_caption.mp4")
+    vocal_file_path = extract_vocals("output_with_caption.mp4")
 
-    correct_lyrics = genius_lyrics("Astronaut in the Ocean", "Masked Wolf")
+    correct_lyrics = genius_lyrics(song_name, artist_name)
 
-    transcribed_segments = transcribe_audio_whisper_with_segments("output_with_caption/vocals.wav")
+    transcribed_segments = transcribe_audio_whisper_with_segments(vocal_file_path)
 
     matched_segments = match_correct_lyrics(transcribed_segments, correct_lyrics)
 
-    add_captions_to_video_from_matched("output_with_caption.mp4", matched_segments)
+    add_captions_to_video_from_matched("output_with_caption.mp4", matched_segments, day, song_name, artist_name)
 
     gc.collect()
 
+
 if __name__ == "__main__":
+    song_info = load_song_info()
+    day = song_info['day']
+    song_name = song_info['song_name']
+    artist_name = song_info['artist_name']
+
     run_caption_pipeline()

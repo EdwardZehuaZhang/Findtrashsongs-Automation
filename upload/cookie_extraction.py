@@ -85,13 +85,17 @@ def login_to_youtube_and_save_cookies(driver, email, password, cookies_file):
     password_input.send_keys(password)
     random_sleep(1, 2)
     password_input.send_keys(Keys.RETURN)
+    random_sleep(1, 2)
+
+    driver.get("https://www.youtube.com/")
     
     random_sleep(5, 8)
 
-    driver.get("https://www.youtube.com/")
+    cookies = driver.get_cookies()
+    print(cookies)  
 
     with open(cookies_file, 'wb') as file:
-        pickle.dump(driver.get_cookies(), file)
+        pickle.dump(cookies, file)
 
 def login_to_snapchat_and_save_cookies(driver, username, password, cookies_file):
     driver.get('https://my.snapchat.com/')

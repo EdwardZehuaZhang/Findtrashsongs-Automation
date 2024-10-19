@@ -5,7 +5,7 @@ from pkg_resources import parse_version
 from PIL import Image
 import json
 
-#TextClip.list('font')
+#print(TextClip.list('font'))
 
 if parse_version(Image.__version__) >= parse_version('10.0.0'):
     Image.ANTIALIAS = Image.LANCZOS
@@ -18,11 +18,15 @@ def edit_video_body(path):
 
     clip = VideoFileClip(path)
     try:
-        cut_clip = clip.subclip(45, 75)
+        cut_clip = clip.subclip(75, 105)
 
-        cropped_clip = crop(cut_clip, x_center=clip.w // 2, y_center=clip.h // 2, width=866, height=1080)
+        resize_clip = cut_clip.resize(height=1188)
 
-        resize_clip = cropped_clip.resize(height=1188)
+        resize_clip = crop(resize_clip, x_center=resize_clip.w // 2, y_center=resize_clip.h // 2, width=953, height=1188)
+
+        #resize_clip = crop(cut_clip, x_center=clip.w // 2, y_center=clip.h // 2, width=866, height=1080)
+
+        #resize_clip = cropped_clip.resize(height=1188)
 
         white_background = ColorClip(size=(1080, 1920), color=(255, 255, 255), duration=resize_clip.duration)
 

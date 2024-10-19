@@ -19,8 +19,6 @@ def save_song_info_to_file(day, song_name, artist_name, file_path='song_info.jso
     with open(file_path, 'w') as json_file:
         json.dump(song_info, json_file)
 
-
-
 def load_song_info(file_path='song_info.json'):
     with open(file_path, 'r') as json_file:
         return json.load(json_file)
@@ -47,16 +45,28 @@ def process_first_row(csv_file):
 
     return day, song_name, artist_name
 
+def run_subprocess_with_realtime_output(command, cwd=None):
+    process = subprocess.Popen(
+        command, 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE, 
+        universal_newlines=True, 
+        encoding='utf-8', 
+        errors='replace',
+        cwd=cwd  
+    )
+    
+    stdout, stderr = process.communicate()
+    
+    if stdout:
+        print(stdout)
+    if stderr:
+        print(stderr)
 
-def run_subprocess_with_realtime_output(command):
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-    while True:
-        output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
-            break
-        if output:
-            print(output.strip())
-    process.poll()
+    if process.returncode != 0:
+        logging.error(f"Command failed with return code {process.returncode}: {stderr}")
+    return process.returncode
+
 
 def run_pipeline():
     logging.basicConfig(
@@ -80,19 +90,35 @@ def run_pipeline():
     artist_name = song_info['artist_name']
 
     logging.info("Starting description generation...")
-    run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", "description.py"])
+    return_code = run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", "description.py"])
+    if return_code != 0:
+        logging.error("Description generation failed. Exiting pipeline.")
+        return
 
-    logging.info("Starting download pipeline...")
-    run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", "download.py"])
-
-    logging.info("Starting video editing...")
-    run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", "edit.py"])
-
-    time.sleep(20)
     gc.collect()
 
+    logging.info("Starting download pipeline...")
+    return_code = run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", "download.py"])
+    if return_code != 0:
+        logging.error("Download pipeline failed. Exiting pipeline.")
+        return
+
+    gc.collect()
+
+    logging.info("Starting video editing...")
+    return_code = run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", "edit.py"], cwd="D:/Coding Files/GitHub/Findtrashsongs Automation/")
+    if return_code != 0:
+        logging.error("Video editing failed. Exiting pipeline.")
+        return
+
+    gc.collect()
+    time.sleep(10)
+
     logging.info("Starting caption pipeline...")
-    run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", "caption.py"])
+    return_code = run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", "caption.py"])
+    if return_code != 0:
+        logging.error("Caption pipeline failed. Exiting pipeline.")
+        return
 
     gc.collect()
 
@@ -119,9 +145,11 @@ def run_pipeline():
     main_script_path = os.path.join(os.path.dirname(__file__), 'upload', 'main.py')
 
     logging.info("Starting the final upload script...")
-    run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", main_script_path])
-
-    logging.info("All tasks completed.")
+    return_code = run_subprocess_with_realtime_output([r"D:/Coding Files/GitHub/Findtrashsongs Automation/.venv/Scripts/python.exe", main_script_path])
+    if return_code != 0:
+        logging.error("Final upload script failed.")
+    else:
+        logging.info("All tasks completed.")
 
 if __name__ == "__main__":
     csv_file = "D:\\Coding Files\\GitHub\\Findtrashsongs Automation\\Playlist.csv"

@@ -28,9 +28,9 @@ def main():
     description_file_path = Config.description_file_path
 
     platforms = [
-        ("Snapchat", snapchat_upload, None),
-        ("TikTok", tiktok_upload, Config.tiktok_cookies_file),
-        ("Instagram", instagram_upload, Config.instagram_cookies_file),
+        # ("Snapchat", snapchat_upload, None),
+        # ("TikTok", tiktok_upload, Config.tiktok_cookies_file),
+        # ("Instagram", instagram_upload, Config.instagram_cookies_file),
         ("YouTube", youtube_upload, Config.youtube_cookies_file),
         ("X", x_upload, Config.x_cookies_file),
         ("Linkedin", linkedin_upload, Config.linkedin_cookies_file)

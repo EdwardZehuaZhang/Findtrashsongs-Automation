@@ -121,6 +121,7 @@ def upload_video(driver, video_path, title, description, tags):
     except Exception as e:
         print("Failed to detect published stage message:", e)
 
+
 def main(video_path, description_file_path, cookies_file):
     title, description, tags = read_video_details(description_file_path)
     options = uc.ChromeOptions()

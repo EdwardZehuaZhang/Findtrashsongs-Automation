@@ -78,7 +78,7 @@ def add_captions_to_video_from_matched(video_path, matched_segments, day, song_n
 
         print(f"Adding caption: {text} from {start_time} to {end_time}")
         
-        caption = TextClip(text, font="OCR-A-Extended", fontsize=37, color='white', 
+        caption = TextClip(text, font="OCR-A-Extended", fontsize=37, color='white',
                            size=(video.w - 600, None), method='caption')
         
         caption = caption.set_position(('center', 940)) \

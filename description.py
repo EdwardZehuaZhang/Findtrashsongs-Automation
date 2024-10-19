@@ -3,28 +3,30 @@ import pandas as pd
 import json
 
 
-openai.api_key = ""  # Replace this with your actual OpenAI API key
+openai.api_key = "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"  # Replace this with your actual OpenAI API key
 
 
 def generate_negative_critique(song_name, artist_name):
     prompt = f"""
-    Write a 400 character negative song critique on {song_name} by {artist_name} in the following format:
+    Write a negative song critique on {song_name} by {artist_name} in the following format:
 
-    {song_name} - {artist_name}
-    \n
-    400 character critique
-    \n
+    {song_name} - {artist_name} 
+    space
+    380 character critique
+    space
     28 different hashtags
     
-    Do not include any fluff when producing content. Each sentence should provide value to the overall goal of the content piece. Strictly follow this guideline. Avoid filler and padding words.
+    Do not include any fluff when producing content. Each sentence should provide value to the overall goal of the content piece. Strictly follow this guideline. 
 
     My target audience are Instagram users. I am trying to create controversies. Keep this in mind and make sure critique has a clear negative tone.
 
     Make the content conversational, empathetic, sarcastic, and occasionally humorous. Use idioms, metaphors, anecdotes, and natural dialogue to add personality. But don't be Shakespeare.
 
-    Incorporate internet slang words and technical jargons. Mention specific details such as the chord progression pacing, and others. 
+    Incorporate internet slang words and musical technical jargons. Mention specific details such as progression, pacing, and others. 
 
     For hashtags, avoid generating random or meaningless tags like "hozierharmony" or "musicaljourney." Use simple, relevant words instead, and don't have to be negative, focus on maxmium engagement. For example, hashtags for "Beat It" by Michael Jackson could be #michaeljackson, #kingofpop, #beatit, or #nostalgicmusic. For "Somebody That I Used to Know" by Gotye, use tags like #gotye, #kimbra, #technomusic, or #technoremix. 
+
+    Do generate without formating the text.
     """
     
     try:

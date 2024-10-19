@@ -62,7 +62,7 @@ def upload_video(driver, video_path, description_file_path, description=None):
 
         webdriver.ActionChains(driver).send_keys(Config.snapchat_username).send_keys(Keys.RETURN).perform()
 
-        time.sleep(30)
+        time.sleep(10)
 
         WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.XPATH, f"//p[text()='{Config.snapchat_username}']"))

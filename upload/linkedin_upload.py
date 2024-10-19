@@ -100,7 +100,7 @@ def upload_video(driver, video_path, description):
     except Exception as e:
         print("Post sharing failed:", e)
     
-    time.sleep(30)
+    time.sleep(15)
 
     try:
         time.sleep(5)

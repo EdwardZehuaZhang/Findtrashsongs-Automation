@@ -3,7 +3,7 @@ import pandas as pd
 import json
 
 
-openai.api_key = "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"  # Replace this with your actual OpenAI API key
+openai.api_key = ""  # Replace this with your actual OpenAI API key
 
 
 def generate_negative_critique(song_name, artist_name):
